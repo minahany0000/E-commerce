@@ -6,10 +6,15 @@ import { deleteFromDb } from "./utils/deleteFromDb.js";
 import cors from "cors"
 
 export const initApp = (app, express) => {
-    const port = process.env.PORT || 3001
+    const port = 3000//process.env.PORT || 3001
     app.use(cors())
     // json
-    app.use(express.json());
+    app.use((req, res, next) => {
+        if (req.originalUrl == "/order/webhook") {
+            next()
+        } else
+            express.json()(req, res, next);
+    })
 
 
     // connct database
@@ -19,7 +24,7 @@ export const initApp = (app, express) => {
     app.get('/', (req, res) => res.send('Welcome in my E-commerce app'))
 
 
-    
+
     app.use('/users', routers.userRouter)
     app.use('/category', routers.categoryRouter)
     app.use('/subCategory', routers.subCategoryRouter)

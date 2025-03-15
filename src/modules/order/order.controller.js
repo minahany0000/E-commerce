@@ -8,6 +8,8 @@ import sendEmail from "../../services/sendEmail.js";
 import { payment } from "../../utils/payment.js";
 import Stripe from "stripe";
 
+const stripe = new Stripe(process.env.SECRET_KEY_STRIPE);
+
 export const createOrder = async (req, res, next) => {
     try {
         const { productId, quantity, couponCode, address, phone, paymentMethod, city, street, state } = req.body;
@@ -95,7 +97,7 @@ export const createOrder = async (req, res, next) => {
         });
 
         if (couponCode) {
-            coupon.usedBy.push(req.user._id);
+            //coupon.usedBy.push(req.user._id);
             await coupon.save();
         }
 
@@ -207,3 +209,27 @@ export const cancelOrder = async (req, res, next) => {
         return next(new appError(error.message || "Something went wrong", 500)); // ✅ Improved error handling
     }
 };
+
+export const webhook = async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+    let event;
+
+    try {
+        event = stripe.webhooks.constructEvent(req.body, sig, process.env.SIGNING_SECRET);
+    } catch (err) {
+        console.error('Webhook signature verification failed.', err.message);
+        return res.status(400).send('Webhook Error');
+    }
+
+    const { orderId } = event.data.object.metadata
+
+    if (event.type === 'checkout.session.completed') {
+        await orderModel.findOneAndUpdate({ _id: orderId }, { status: "placed" })
+        console.log('💰 Payment successful:', event.data.object);
+        res.status(200).json({ msg: "done" });
+    } else {
+        await orderModel.findOneAndUpdate({ _id: orderId }, { status: "rejected" })
+        res.status(400).json({ msg: "fail" });
+    }
+
+}

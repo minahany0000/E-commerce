@@ -21,7 +21,7 @@ const orderSchema = new mongoose.Schema(
         address: { type: String, required: true },
         phone: { type: String, required: true },
         paymentMethod: { type: String, required: true, enum: ["card", "cash"] },
-        status: { type: String, required: true, enum: ["placed", "waitPayment", "delivered", "onWay", "cancelled"], default: "placed" },
+        status: { type: String, required: true, enum: ["placed", "waitPayment", "delivered", "onWay", "cancelled" , "rejected"], default: "placed" },
         reason: { type: String },
 
     },
