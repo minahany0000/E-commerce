@@ -5,13 +5,15 @@ import productModel from "../../../db/models/product.model.js";
 import appError from "../../utils/appError.js";
 import { createInvoice } from "../../services/invoice.js";
 import sendEmail from "../../services/sendEmail.js";
+import { payment } from "../../utils/payment.js";
+import Stripe from "stripe";
 
 export const createOrder = async (req, res, next) => {
     try {
         const { productId, quantity, couponCode, address, phone, paymentMethod, city, street, state } = req.body;
 
         // Validate the payment method
-        if (!["cash", "credit"].includes(paymentMethod)) { // ✅ Added validation for payment method
+        if (!["cash", "card"].includes(paymentMethod)) { // ✅ Added validation for payment method
             return next(new appError("Invalid payment method", 400));
         }
 
@@ -109,18 +111,61 @@ export const createOrder = async (req, res, next) => {
         if (isCartOrder) {
             Order = await cartModel.findOneAndUpdate({ userId: req.user._id }, { $set: { products: [] } }, { new: true });
         }
-        const invoice = {
-            name: req.user.name,
-            address,
-            items: finalProducts,
-            totalPrice,
-            paid: 0,
-            city,
-            street,
-            state
-        };
-        createInvoice(invoice, "invoice.pdf");
-        await sendEmail(req.user.email, "invoice", "", "invoice.pdf");
+        // const invoice = {
+        //     name: req.user.name,
+        //     address,
+        //     items: finalProducts,
+        //     totalPrice,
+        //     paid: 0,
+        //     city,
+        //     street,
+        //     state
+        // };
+        // createInvoice(invoice, "invoice.pdf");
+        // await sendEmail(req.user.email, "invoice", "", "invoice.pdf");
+
+
+
+        if (paymentMethod == "card") {
+            const stripe = new Stripe(process.env.SECRET_KEY_STRIPE)
+            if (!order.products || order.products.length === 0) {
+                return res.status(400).json({ msg: "Order has no products" });
+            }
+            if (req.body?.couponCode) {
+                const coupon = await stripe.coupons.create({
+                    percent_off: discount,
+                    duration: "once"
+                })
+                console.log(coupon);
+
+                req.body.couponId = coupon.id
+            }
+
+            const session = await payment({
+                payment_method_types: ["card"],
+                mode: "payment",
+                customer_email: req.user.email,
+                metadata: {
+                    orderId: order._id.toString()
+                },
+                success_url: `${req.protocol}://${req.headers.host}/orders/success/${order._id}`,
+                cancel_url: `${req.protocol}://${req.headers.host}/orders/cancel/${order._id}`,
+                line_items: order.products.map((product) => ({
+                    price_data: {
+                        currency: "egp",
+                        product_data: { name: product.title },
+                        unit_amount: Math.round(product.price * 100) // Ensure integer value
+                    },
+                    quantity: product.quantity
+                })),
+                discounts: req.body?.couponId ? [{ coupon: req.body.couponId }] : []
+            });
+
+            return res.status(201).json({ msg: "Order placed successfully", url: session.url, session });
+        }
+
+
+
         res.status(201).json({ msg: "Order placed successfully", order });
     } catch (error) {
         next(new appError(error.message || "Something went wrong", 500)); // ✅ Improved error handling

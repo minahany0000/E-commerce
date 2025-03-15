@@ -11,7 +11,7 @@ export const createOrderValidation = {
         street: Joi.string().trim().min(5).max(100).required(),
         state: Joi.string().trim().min(5).max(100).required(),
         phone: Joi.string().pattern(/^(01)[0-9]{9}$/).required(),
-        paymentMethod: Joi.string().valid("cash", "credit").required(),
+        paymentMethod: Joi.string().valid("cash", "card").required(),
     }),
 
     headers: generalField.headers.required(),
