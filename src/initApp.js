@@ -3,11 +3,9 @@ import * as routers from './modules/index.routes.js'
 import { globalErrorHandling } from "./utils/asyncHandler.js";
 import { deleteFromCloudinary } from "./utils/deleteFromCloudinary.js";
 import { deleteFromDb } from "./utils/deleteFromDb.js";
-import cors from "cors"
 
 export const initApp = (app, express) => {
     const port = process.env.PORT || 3000
-    app.use(cors())
     // json
     app.use((req, res, next) => {
         if (req.originalUrl == "/order/webhook") {
