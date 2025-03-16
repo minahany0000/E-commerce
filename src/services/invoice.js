@@ -1,5 +1,5 @@
-import fs from "fs";
-import PDFDocument from "pdfkit";
+import path from "path";
+import PDFDocument, { path } from "pdfkit";
 
 export function createInvoice(invoice, path) {
     let doc = new PDFDocument({ size: "A4", margin: 50 });
@@ -15,7 +15,7 @@ export function createInvoice(invoice, path) {
 
 function generateHeader(doc) {
     doc
-        .image("logo.png", 15, 15, { width: 150 })
+        .image(path.join(__dirname, "logo.png"), 15, 15, { width: 150 })
         .fillColor("#444444")
         .fontSize(10)
         .text("Bulkify.", 200, 50, { align: "right" })
@@ -23,6 +23,7 @@ function generateHeader(doc) {
         .text("Cairo Egypt", 200, 80, { align: "right" })
         .moveDown();
 }
+
 
 function generateCustomerInformation(doc, invoice) {
     doc
