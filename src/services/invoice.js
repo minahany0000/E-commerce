@@ -2,12 +2,14 @@ import fs from "fs";
 import PDFDocument from "pdfkit";
 import path from "path";
 import { fileURLToPath } from "url";
-
 // Define __dirname manually
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export function createInvoice(invoice, filePath) {
+import os from "os";
+
+export function createInvoice(invoice) {
+    const tempPath = path.join(os.tmpdir(), "invoice.pdf"); // Save in a temp directory
     let doc = new PDFDocument({ size: "A4", margin: 50 });
 
     generateHeader(doc);
@@ -15,9 +17,13 @@ export function createInvoice(invoice, filePath) {
     generateInvoiceTable(doc, invoice);
     generateFooter(doc);
 
+    doc.pipe(fs.createWriteStream(tempPath));
     doc.end();
-    doc.pipe(fs.createWriteStream(filePath));
+    
+    console.log(`Invoice saved at: ${tempPath}`);
+    return tempPath; // Return the path to use it later
 }
+
 
 function generateHeader(doc) {
     doc
@@ -62,17 +68,17 @@ function generateCustomerInformation(doc, invoice) {
 function generateInvoiceTable(doc, invoice) {
     const invoiceTableTop = 330;
     doc.font("Helvetica-Bold");
-    
+
     generateTableRow(doc, invoiceTableTop, "Item", "", "Unit Cost", "Quantity", "Total");
     generateHr(doc, invoiceTableTop + 20);
-    
+
     doc.font("Helvetica");
     let total = 0;
 
     for (let i = 0; i < invoice.items.length; i++) {
         const item = invoice.items[i];
         const position = invoiceTableTop + (i + 1) * 30;
-        
+
         total += item.finalPrice * item.quantity;
 
         generateTableRow(
