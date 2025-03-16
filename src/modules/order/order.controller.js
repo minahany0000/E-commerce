@@ -198,8 +198,8 @@ export const successPayment = async (req, res, next) => {
         street: order.userId.address.street,
         state: order.userId.address.state
     };
-    createInvoice(invoice, "./invoice.pdf");
-    await sendEmail(order.userId.email, "invoice", "", "./invoice.pdf");
+    createInvoice(invoice, "invoice.pdf");
+    await sendEmail(order.userId.email, "invoice", "", "invoice.pdf");
 
     res.status(201).json({ msg: "Payment done succefully check your email for the invoice" });
 
