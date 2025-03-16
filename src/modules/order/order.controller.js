@@ -149,8 +149,8 @@ export const createOrder = async (req, res, next) => {
                 metadata: {
                     orderId: order._id.toString()
                 },
-                success_url: `https://e-commerce-rust-ten-99.vercel.app/order/successPayment/${order._id}`,
-                cancel_url: `https://e-commerce-rust-ten-99.vercel.app/order/cancel/${order._id}`,
+                success_url: `https://e-commerce-rust-ten-99.vercel.app//order/successPayment/${order._id}`,
+                cancel_url: `https://e-commerce-rust-ten-99.vercel.app//order/cancel/${order._id}`,
                 line_items: order.products.map((product) => ({
                     price_data: {
                         currency: "egp",
@@ -177,27 +177,26 @@ export const createOrder = async (req, res, next) => {
 export const successPayment = async (req, res, next) => {
     const { orderId } = req.params
 
-    const checkOrder = await orderModel.findById(orderId)
-    if (checkOrder.status == "placed") {
-        return next(new appError("Payment already done", 400))
-    }
-    if (!checkOrder) {
+    const orderExist =  await orderModel.findByIdAndUpdate(orderId, { status: "placed" });
+    if(!orderExist){
         return next(new appError("Order not exist"))
-    }
-    await orderModel.findByIdAndUpdate(orderId, { status: "placed" });
 
+    }
+    // if(orderExist.status == "placed"){
+    //     return next(new appError("Payment done"))
+    // }
 
     const order = await orderModel.findById(orderId).populate("userId");
 
     const invoice = {
-        name: order.userId.name,
-        address: order.address,
+        name:order.userId.name,
+        address:order.address,
         items: order.products,
-        totalPrice: order.totalPrice,
+        totalPrice:order.totalPrice,
         paid: order.totalPrice,
-        city: order.userId.address.city,
-        street: order.userId.address.street,
-        state: order.userId.address.state
+        city:order.userId.address.city,
+        street:order.userId.address.street,
+        state:order.userId.address.state
     };
     createInvoice(invoice, "invoice.pdf");
     await sendEmail(order.userId.email, "invoice", "", "invoice.pdf");
