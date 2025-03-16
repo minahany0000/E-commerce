@@ -1,6 +1,11 @@
 import fs from "fs";
 import PDFDocument from "pdfkit";
 import path from "path";
+import { fileURLToPath } from "url";
+
+// Define __dirname manually
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export function createInvoice(invoice, path) {
     let doc = new PDFDocument({ size: "A4", margin: 50 });
