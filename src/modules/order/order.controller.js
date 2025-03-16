@@ -10,6 +10,7 @@ import Stripe from "stripe";
 import userModel from "../../../db/models/user.model.js";
 
 import os from "os";
+import path from "path";
 
 const tempPath = path.join(os.tmpdir(), "invoice.pdf"); // Temporary path
 
@@ -205,7 +206,7 @@ export const successPayment = async (req, res, next) => {
     };
     createInvoice(invoice, tempPath); 
     await sendEmail(order.userId.email, "invoice", "", tempPath);
-    
+
     res.status(201).json({ msg: "Payment done succefully check your email for the invoice" });
 
 }
