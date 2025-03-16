@@ -177,8 +177,8 @@ export const createOrder = async (req, res, next) => {
 export const successPayment = async (req, res, next) => {
     const { orderId } = req.params
 
-    const orderExist =  await orderModel.findByIdAndUpdate(orderId, { status: "placed" });
-    if(!orderExist){
+    const orderExist = await orderModel.findByIdAndUpdate(orderId, { status: "placed" });
+    if (!orderExist) {
         return next(new appError("Order not exist"))
 
     }
@@ -189,17 +189,17 @@ export const successPayment = async (req, res, next) => {
     const order = await orderModel.findById(orderId).populate("userId");
 
     const invoice = {
-        name:order.userId.name,
-        address:order.address,
+        name: order.userId.name,
+        address: order.address,
         items: order.products,
-        totalPrice:order.totalPrice,
+        totalPrice: order.totalPrice,
         paid: order.totalPrice,
-        city:order.userId.address.city,
-        street:order.userId.address.street,
-        state:order.userId.address.state
+        city: order.userId.address.city,
+        street: order.userId.address.street,
+        state: order.userId.address.state
     };
-    createInvoice(invoice, "invoice.pdf");
-    await sendEmail(order.userId.email, "invoice", "", "invoice.pdf");
+    createInvoice(invoice, "./invoice.pdf");
+    await sendEmail(order.userId.email, "invoice", "", "./invoice.pdf");
 
     res.status(201).json({ msg: "Payment done succefully check your email for the invoice" });
 
