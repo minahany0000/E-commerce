@@ -9,6 +9,11 @@ import { payment } from "../../utils/payment.js";
 import Stripe from "stripe";
 import userModel from "../../../db/models/user.model.js";
 
+import os from "os";
+
+const tempPath = path.join(os.tmpdir(), "invoice.pdf"); // Temporary path
+
+
 const stripe = new Stripe(process.env.SECRET_KEY_STRIPE);
 
 export const createOrder = async (req, res, next) => {
@@ -198,9 +203,9 @@ export const successPayment = async (req, res, next) => {
         street: order.userId.address.street,
         state: order.userId.address.state
     };
-    createInvoice(invoice, "invoice.pdf");
-    await sendEmail(order.userId.email, "invoice", "", "invoice.pdf");
-
+    createInvoice(invoice, tempPath); 
+    await sendEmail(order.userId.email, "invoice", "", tempPath);
+    
     res.status(201).json({ msg: "Payment done succefully check your email for the invoice" });
 
 }
