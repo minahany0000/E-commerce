@@ -149,8 +149,8 @@ export const createOrder = async (req, res, next) => {
                 metadata: {
                     orderId: order._id.toString()
                 },
-                success_url: `${req.protocol}://${req.headers.host}/order/successPayment/${order._id}`,
-                cancel_url: `${req.protocol}://${req.headers.host}/order/cancel/${order._id}`,
+                success_url: `https://e-commerce-rust-ten-99.vercel.app/order/successPayment/${order._id}`,
+                cancel_url: `https://e-commerce-rust-ten-99.vercel.app/order/cancel/${order._id}`,
                 line_items: order.products.map((product) => ({
                     price_data: {
                         currency: "egp",
