@@ -1,5 +1,6 @@
+import fs from "fs";
+import PDFDocument from "pdfkit";
 import path from "path";
-import PDFDocument, { path } from "pdfkit";
 
 export function createInvoice(invoice, path) {
     let doc = new PDFDocument({ size: "A4", margin: 50 });
@@ -12,7 +13,6 @@ export function createInvoice(invoice, path) {
     doc.end();
     doc.pipe(fs.createWriteStream(path));
 }
-
 function generateHeader(doc) {
     doc
         .image(path.join(__dirname, "logo.png"), 15, 15, { width: 150 })
