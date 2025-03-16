@@ -13,13 +13,13 @@ const couponRouter = Router();
 couponRouter.post(
     "/createcoupon",
     validate(BV.createCouponValidation),
-    auth([systemRoles.user]),
+    auth([systemRoles.admin]),
     asyncHandler(BC.createCoupon)
 );
 couponRouter.patch(
     "/updateCoupon/:id",
     validate(BV.updateCouponValidation),
-    auth([systemRoles.user]),
+    auth([systemRoles.admin]),
     asyncHandler(BC.updateCoupon)
 );
 

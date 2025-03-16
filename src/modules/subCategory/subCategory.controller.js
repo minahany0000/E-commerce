@@ -4,8 +4,7 @@ import appError from "../../utils/appError.js"
 import categoryModel from "../../../db/models/category.model.js"
 import cloudinary from "../../utils/cloudinary.js"
 import slugify from "slugify"
-
-
+import { ApiFeatures } from "../../utils/apiFeatures.js"
 
 
 /*
@@ -20,7 +19,7 @@ export const createSubCategory = async (req, res, next) => {
         return next(new appError("subCategory exist", 409))
     }
     if (!category) {
-        return next(new appError("Category not exist", 409))
+        return next(new appError("Category not exist", 400))
     }
     if (!req.file) {
         return next(new appError("Image is required", 400))
@@ -44,33 +43,54 @@ export const createSubCategory = async (req, res, next) => {
         categoryId,
         customId
     })
+
     res.status(201).json({ msg: "created", subCategory })
 }
 /*
 getSubCategories by all
 */
 export const getSubCategories = async (req, res, next) => {
-
-    const subCategory = await subCategoryModel.find({})
-
-    res.status(200).json({ msg: "created", subCategory })
+    const apiFeatures = new ApiFeatures(subCategoryModel.find(), req.query)
+        .filter()
+        .pagination()
+        .search()
+        .sort()
+        .select()
+    const subCategories = await apiFeatures.query
+    res.status(200).json({ msg: "Done", page: apiFeatures.page, subCategories })
 }
 
-/**
- * 
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- */
-export const getCategorySubCatigories = async (req, res, next) => {
 
-    const subCategory = await subCategoryModel.find({}).populate([
-        {
-            path: "createdBy"
-        },
-        {
-            path: "categoryId"
-        }])
+export const getCategoryById = async (req, res, next) => {
 
-    res.status(200).json({ msg: "created", subCategory })
+    const { categoryId } = req.params
+    const category = await categoryModel.findById(categoryId)
+    if (!category) {
+        return next(new appError("Category not found", 404))
+    }
+    const apiFeatures = new ApiFeatures(subCategoryModel.find({ categoryId }), req.query)
+        .filter()
+        .pagination()
+        .search()
+        .sort()
+        .select()
+
+    const subCategories = await apiFeatures.query
+    res.status(200).json({ msg: "Done", page: apiFeatures.page, subCategories })
+}
+export const deleteSubCategory = async (req, res, next) => {
+
+    const { categoryId, subCategoryId } = req.params
+    const category = await categoryModel.findById(categoryId)
+    if (!category) {
+        return next(new appError("Category not found", 404))
+    }
+    const subCategory = await subCategoryModel.findByIdAndDelete(subCategoryId)
+    if (!subCategory) {
+        return next(new appError("subCategory not found", 404))
+    }
+    await subCategoryModel.deleteOne({ _id: subCategoryId })
+    await cloudinary.api.delete_resources_by_prefix(`EcommerceMedia/categories/${category.customId}/subCategory/${subCategory.customId}`)
+    await cloudinary.api.delete_folder(`EcommerceMedia/categories/${category.customId}/subCategory/${subCategory.customId}`)
+    return res.status(200).json({ msg: "done", category })
 }

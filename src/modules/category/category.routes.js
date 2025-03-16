@@ -16,21 +16,26 @@ categoryRouter.use('/:categoryId/subCategory', subCategoryRouter)
 categoryRouter.post('/createCategory',
     multerHost(validExtensions.image).single('image'),
     validate(CV.createCategoryValidation),
-    auth([systemRoles.user]),
+    auth([systemRoles.admin]),
     asyncHandler(CC.createCategory)
 )
+categoryRouter.get('/getCategories',
+    asyncHandler(CC.getCategories)
+)
+categoryRouter.get('/getCategory/:id',
+    asyncHandler(CC.getCategory)
+)
+
 categoryRouter.put('/updateCategory/:id',
     multerHost(validExtensions.image).single('image'),
     validate(CV.updateCategoryValidation),
-    auth([systemRoles.user]),
+    auth([systemRoles.admin]),
     asyncHandler(CC.updateCategory)
 )
-categoryRouter.get('/getCategory',
-    auth([systemRoles.user]),
-    asyncHandler(CC.getCategory)
-)
+
 categoryRouter.delete('/deleteCategory/:id',
-    auth([systemRoles.user]),
+    validate(CV.deleteCategoryValidation),
+    auth([systemRoles.admin]),
     asyncHandler(CC.deleteCategory)
 )
 // get all categories

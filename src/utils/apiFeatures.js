@@ -12,6 +12,7 @@ export class ApiFeatures {
         this.query.find().skip(skip).limit(limit);
         this.page = page
         return this;
+
     }
 
     filter() {
@@ -20,7 +21,7 @@ export class ApiFeatures {
         excludeQuery.forEach((e) => delete filterQuery[e]);
         filterQuery = JSON.parse(
             JSON.stringify(filterQuery).replace(
-                /(gt|lt|gte|lte|eq)/d,
+                /\b(gt|lt|gte|lte|eq)\b/g,
                 (match) => `$${match}`
             )
         );

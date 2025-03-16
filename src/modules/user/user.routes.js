@@ -4,6 +4,7 @@ import asyncHandler from "../../utils/asyncHandler.js"
 import validate from "../../middleware/validate.js"
 import * as UV from './user.validation.js'
 import auth from "../../middleware/auth.js"
+import { systemRoles } from "../../utils/systemRoles.js"
 
 const userRouter = Router()
 
@@ -33,23 +34,23 @@ userRouter.patch('/resetPassword',
     asyncHandler(UC.resetPassword)
 )
 userRouter.delete('/logOut',
-    auth(["user", "admin"]),
+    auth([systemRoles.admin, systemRoles.user]),
     validate(UV.logOutValidation),
     asyncHandler(UC.logOut)
 )
 userRouter.patch('/updateProfile',
-    auth(["user", "admin"]),
+    auth([systemRoles.admin, systemRoles.user]),
     validate(UV.updateProfileValidation),
     asyncHandler(UC.updateProfile)
 )
 
 userRouter.get('/myProfile',
-    auth(["user", "admin"]),
+    auth([systemRoles.admin, systemRoles.user]),
     asyncHandler(UC.myProfile)
 )
 
 userRouter.get('/allUsers',
-    auth(["admin"]),
+    auth(systemRoles.admin),
     asyncHandler(UC.allUsers)
 )
 

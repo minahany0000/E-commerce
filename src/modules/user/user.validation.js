@@ -51,43 +51,48 @@ export const signUpValidation = {
             .messages({
                 'string.pattern.base': 'Phone number must be a valid Egyptian mobile number starting with 010, 011, 012, or 015 and followed by 8 digits.',
             }),
-        address: joi.object({
-            street: joi.string()
-                .min(3)
-                .max(100).
-                required()
-                .messages({
-                    'string.base': 'Street must be a string.',
-                    'string.empty': 'Street cannot be empty.',
-                    'string.min': 'Street should have a minimum length of {#limit} characters.',
-                    'string.max': 'Street should have a maximum length of {#limit} characters.',
-                    'any.required': 'Street is a required field'
+        street: joi.string()
+            .min(3)
+            .max(100).
+            required()
+            .messages({
+                'string.base': 'Street must be a string.',
+                'string.empty': 'Street cannot be empty.',
+                'string.min': 'Street should have a minimum length of {#limit} characters.',
+                'string.max': 'Street should have a maximum length of {#limit} characters.',
+                'any.required': 'Street is a required field'
 
-                }),
-            city: joi.string()
-                .min(2)
-                .max(50)
-                .required()
-                .messages({
-                    'string.base': 'City must be a string.',
-                    'string.empty': 'City cannot be empty.',
-                    'string.min': 'City should have a minimum length of {#limit} characters.',
-                    'string.max': 'City should have a maximum length of {#limit} characters.',
-                    'any.required': 'City is a required field'
-                }),
-            state: joi.string()
-                .min(2)
-                .max(50)
-                .required()
-                .messages({
-                    'string.base': 'State must be a string.',
-                    'string.empty': 'State cannot be empty.',
-                    'string.min': 'State should have a minimum length of {#limit} characters.',
-                    'string.max': 'State should have a maximum length of {#limit} characters.',
-                    'any.required': 'State is a required field'
-                }),
-        })
-
+            }),
+        city: joi.string()
+            .min(2)
+            .max(50)
+            .required()
+            .messages({
+                'string.base': 'City must be a string.',
+                'string.empty': 'City cannot be empty.',
+                'string.min': 'City should have a minimum length of {#limit} characters.',
+                'string.max': 'City should have a maximum length of {#limit} characters.',
+                'any.required': 'City is a required field'
+            }),
+        state: joi.string()
+            .min(2)
+            .max(50)
+            .required()
+            .messages({
+                'string.base': 'State must be a string.',
+                'string.empty': 'State cannot be empty.',
+                'string.min': 'State should have a minimum length of {#limit} characters.',
+                'string.max': 'State should have a maximum length of {#limit} characters.',
+                'any.required': 'State is a required field'
+            }),
+        role: joi.string()
+            .valid('admin', 'user')
+            .optional()
+            .messages({
+                'any.only': 'Role must be either "admin" or "user".',
+                'string.base': 'Role must be a string.',
+                'string.empty': 'Role cannot be empty.',
+            }),
     }).with("password", "cPassword")
 
 }
@@ -193,32 +198,30 @@ export const updateProfileValidation = {
             .messages({
                 'string.pattern.base': 'Phone number must be a valid Egyptian mobile number starting with 010, 011, 012, or 015 and followed by 8 digits.',
             }),
-        address: joi.object({
-            street: joi.string()
-                .min(3)
-                .max(100)
-                .messages({
-                    'string.base': 'Street must be a string.',
-                    'string.min': 'Street should have a minimum length of {#limit} characters.',
-                    'string.max': 'Street should have a maximum length of {#limit} characters.',
-                }),
-            city: joi.string()
-                .min(2)
-                .max(50)
-                .messages({
-                    'string.base': 'City must be a string.',
-                    'string.min': 'City should have a minimum length of {#limit} characters.',
-                    'string.max': 'City should have a maximum length of {#limit} characters.',
-                }),
-            state: joi.string()
-                .min(2)
-                .max(50)
-                .messages({
-                    'string.base': 'State must be a string.',
-                    'string.min': 'State should have a minimum length of {#limit} characters.',
-                    'string.max': 'State should have a maximum length of {#limit} characters.',
-                }),
-        })
+        street: joi.string()
+            .min(3)
+            .max(100)
+            .messages({
+                'string.base': 'Street must be a string.',
+                'string.min': 'Street should have a minimum length of {#limit} characters.',
+                'string.max': 'Street should have a maximum length of {#limit} characters.',
+            }),
+        city: joi.string()
+            .min(2)
+            .max(50)
+            .messages({
+                'string.base': 'City must be a string.',
+                'string.min': 'City should have a minimum length of {#limit} characters.',
+                'string.max': 'City should have a maximum length of {#limit} characters.',
+            }),
+        state: joi.string()
+            .min(2)
+            .max(50)
+            .messages({
+                'string.base': 'State must be a string.',
+                'string.min': 'State should have a minimum length of {#limit} characters.',
+                'string.max': 'State should have a maximum length of {#limit} characters.',
+            }),
     }),
     headers: generalField.headers
 };

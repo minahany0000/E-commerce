@@ -35,7 +35,6 @@ export const createProduct = async (req, res, next) => {
     let subPrice = 0
     subPrice = ((100 - discount) / 100) * price * 1.0;
 
-
     const customId = nanoid(5)
     let coverImages = []
     for (const file of req.files.images) {
@@ -46,9 +45,6 @@ export const createProduct = async (req, res, next) => {
     }
 
     const { secure_url, public_id } = req.files.image[0]
-
-
-
 
     const product = await productModel.create({
         title,
@@ -63,15 +59,57 @@ export const createProduct = async (req, res, next) => {
         price,
         discount,
         stock,
-        subPrice
+        subPrice,
+        customId
     })
     return res.status(201).json({ msg: "done", product })
 
 }
+export const deleteProduct = async (req, res, next) => {
+    try {
+        const { id } = req.params
+        const product = await productModel.findById(id).populate([
+            { path: "categoryId" },
+            { path: "subCategoryId" },
+            { path: "brandId" }
+        ]);
+        if (!product) {
+            return next(new appError("Product not found"))
+        }
+        const { categoryId, subCategoryId } = product
+        let category = categoryId
+        let subCategory = subCategoryId
+    
+        await cloudinary.api.delete_resources_by_prefix(`EcommerceMedia/categories/${category.customId}/subCategory/${subCategory.customId}/products/${product.customId}`)
+        await cloudinary.api.delete_folder(`EcommerceMedia/categories/${category.customId}/subCategory/${subCategory.customId}/products/${product.customId}`)
+        await productModel.deleteOne({ _id: id })
 
-export const getProducts = async (req, res, next) => {
+        return res.status(202).json({ msg: "done deleted success" })
+    }
+    catch (error) {
+        return res.status(404).json({ error })
 
+    }
 
+}
+export const getSubCategoryProducts = async (req, res, next) => {
+    const {subCategoryId} = req.params
+    const subCategory = await subCategoryModel.findById(subCategoryId);
+    if (!subCategory) {
+        return next(new Error("Subcategory not found"));
+    }
+    const apiFeatures = new ApiFeatures(productModel.find({subCategoryId}), req.query)
+        .pagination()
+        .filter()
+        .sort()
+        .select()
+        .search()
+
+    const products = await apiFeatures.query
+
+    return res.status(200).json({ msg: "done", page: apiFeatures.page, products })
+}
+export const getAllProducts = async (req, res, next) => {
     const apiFeatures = new ApiFeatures(productModel.find(), req.query)
         .pagination()
         .filter()
@@ -83,3 +121,5 @@ export const getProducts = async (req, res, next) => {
 
     return res.status(200).json({ msg: "done", page: apiFeatures.page, products })
 }
+
+

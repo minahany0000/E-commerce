@@ -14,16 +14,20 @@ const orderRouter = Router();
 orderRouter.post(
     "/createorder",
     validate(BV.createOrderValidation),
-    auth([systemRoles.user]),
+    auth([systemRoles.user , systemRoles.admin]),
     asyncHandler(BC.createOrder)
 );
 orderRouter.delete(
     "/cancelOrder/:id",
     validate(BV.cancelOrderValidation),
-    auth([systemRoles.user]),
+    auth([systemRoles.admin , systemRoles.user]),
     asyncHandler(BC.cancelOrder)
 );
-
+orderRouter.get(
+    "/successPayment/:orderId",
+    // validate(BV.successPaymentValidation),
+    asyncHandler(BC.successPayment)
+);
 
 
 orderRouter.post('/webhook', express.raw({ type: 'application/json' }), BC.webhook);

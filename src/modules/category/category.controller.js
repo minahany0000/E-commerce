@@ -43,7 +43,8 @@ export const createCategory = async (req, res, next) => {
 }
 
 
-export const getCategory = async (req, res, next) => {
+export const getCategories = async (req, res, next) => {
+    
     const category = await categoryModel.find()
     let categories = [];
     for (const c of category) {
@@ -51,6 +52,25 @@ export const getCategory = async (req, res, next) => {
         categories.push({ category: c, subCategories: subCategory })
     }
     res.status(200).json({ msg: "done", categories })
+}
+
+
+
+export const getCategory = async (req, res, next) => {
+    const { id } = req.params
+    const category = await categoryModel.findById(id)
+
+    if (!category) {
+        return next(new appError("Category not exist", 404))
+    }
+
+    const subCategories = await subCategoryModel.find({ categoryId: category._id })
+
+    let categoryData = category.toObject();
+
+    categoryData.subCategories = subCategories;
+
+    res.status(200).json({ msg: "done", category:categoryData })
 }
 
 export const deleteCategory = async (req, res, next) => {
@@ -63,7 +83,7 @@ export const deleteCategory = async (req, res, next) => {
 
     await cloudinary.api.delete_resources_by_prefix(`EcommerceMedia/categories/${category.customId}`)
     await cloudinary.api.delete_folder(`EcommerceMedia/categories/${category.customId}`)
-    return res.status(200).json({ msg: "done", category })
+    return res.status(200).json({ msg: "done" })
 }
 export const updateCategory = async (req, res, next) => {
     const { name } = req.body

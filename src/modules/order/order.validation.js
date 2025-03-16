@@ -27,3 +27,11 @@ export const cancelOrderValidation = {
     })
 
 };
+// export const successPaymentValidation = {
+//     params: Joi.object({
+//         orderId: Joi.string().hex().length(24).required()
+//     }),
+//     headers: Joi.object({
+//         authorization: Joi.string().required()
+//     }).unknown()
+// };

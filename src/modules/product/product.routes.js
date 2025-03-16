@@ -16,7 +16,7 @@ productRouter.use("/:productId/wishList", wishListRouter)
 
 productRouter.post(
     "/createProduct",
-    auth([systemRoles.user]),
+    auth([systemRoles.admin]),
     multerHost(validExtensions.image).fields([
         { name: "image", maxCount: 1 },
         { name: "images", maxCount: 3 }
@@ -24,16 +24,18 @@ productRouter.post(
     validate(PV.createProductValidation),
     asyncHandler(PC.createProduct)
 );
-
 productRouter.get(
     "/",
-    // auth([systemRoles.user]),
-    multerHost(validExtensions.image).fields([
-        { name: "image", maxCount: 1 },
-        { name: "images", maxCount: 3 }
-    ]),
-    // validate(PV.getProductsValidation),
-    asyncHandler(PC.getProducts)
+    asyncHandler(PC.getAllProducts)
 );
-
+productRouter.get(
+    "/getSubCategoryProducts/:subCategoryId",
+    asyncHandler(PC.getSubCategoryProducts)
+);
+productRouter.delete(
+    "/deleteProduct/:id",
+    auth([systemRoles.admin]),
+    validate(PV.deleteProductValidation),
+    asyncHandler(PC.deleteProduct)
+);
 export default productRouter

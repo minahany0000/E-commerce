@@ -13,10 +13,15 @@ const cartRouter = Router();
 cartRouter.post(
     "/createcart",
     validate(BV.createCartValidation),
-    auth(systemRoles.user),
+    auth([systemRoles.user , systemRoles.admin]),
     asyncHandler(BC.createCart)
 );
 // remove product from cart 
-
+cartRouter.delete(
+    "/removeFromCart/:productId",
+    validate(BV.removeFromCartValidation),
+    auth([systemRoles.user , systemRoles.admin]),
+    asyncHandler(BC.removeFromCart)
+);
 
 export default cartRouter;

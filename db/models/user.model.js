@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
 
-const addressSchema = new mongoose.Schema({
-    street: { type: String, minlength: 3, maxlength: 100 },
-    city: { type: String, minlength: 2, maxlength: 50 },
-    state: { type: String, minlength: 2, maxlength: 50 },
-});
+
 
 const userSchema = new mongoose.Schema(
     {
@@ -46,7 +42,9 @@ const userSchema = new mongoose.Schema(
             type: String,
         },
         address: {
-            type: addressSchema,
+            street: { type: String, minlength: 3, maxlength: 100 },
+            city: { type: String, minlength: 2, maxlength: 50 },
+            state: { type: String, minlength: 2, maxlength: 50 },
         },
         loggedIn: {
             type: Boolean,

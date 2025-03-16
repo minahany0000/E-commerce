@@ -8,36 +8,26 @@ import * as CV from "./subCategory.validation.js";
 import { systemRoles } from "../../utils/systemRoles.js";
 
 const subCategoryRouter = Router({ mergeParams: true });
-// zbt al validations
-// create subcategory
+//'/:categoryId/subCategory'
+
 subCategoryRouter.post(
     "/createSubCategory",
     multerHost(validExtensions.image).single("image"),
     validate(CV.createSubCategoryValidation),
-    auth([systemRoles.user]),
+    auth([systemRoles.admin]),
     asyncHandler(SCC.createSubCategory)
 );
 subCategoryRouter.get(
     "/getSubCategories",
-    auth([systemRoles.user, "admin"]),
     asyncHandler(SCC.getSubCategories)
 );
 subCategoryRouter.get(
-    "/getCategorySubCatigories",
-    auth([systemRoles.user, "admin"]),
-    asyncHandler(SCC.getCategorySubCatigories)
+    "/",
+    asyncHandler(SCC.getCategoryById)
 );
-
-// update subcategory
-// subCategoryRouter.put("/updateSubCategory/:id", ...);
-
-// delete subcategory
-// subCategoryRouter.delete("/deleteSubCategory/:id", ...);
-
-// get subcategory by id
-// subCategoryRouter.get("/getSubCategory/:id", ...);
-
-// get all subcategories
-// subCategoryRouter.get("/getAllSubCategories", ...);
-
+subCategoryRouter.delete("/deleteSubCategory/:subCategoryId",
+    validate(CV.deleteSubCategoryValidation),
+    auth([systemRoles.admin]),
+    SCC.deleteSubCategory
+);
 export default subCategoryRouter;

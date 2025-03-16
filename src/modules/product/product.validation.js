@@ -28,6 +28,7 @@ export const createProductValidation = {
         discount: joi.number().min(0).max(100).optional(),
     })
 };
-export const getProductsValidation = {
+
+export const deleteProductValidation = {
     headers: generalField.headers.required(),
 };

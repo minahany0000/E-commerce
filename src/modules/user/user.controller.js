@@ -9,7 +9,7 @@ import { ApiFeatures } from "../../utils/apiFeatures.js"
 User sign up controller
 */
 export const signUp = async (req, res, next) => {
-    const { name, email, password, cPassword, age, phone, street, city, state } = req.body;
+    const { name, email, password, cPassword, age, phone, street, city, state, role } = req.body;
 
     if (password !== cPassword) {
         return next(new appError("Passwords don't match", 400));
@@ -20,7 +20,7 @@ export const signUp = async (req, res, next) => {
         return next(new appError("User already exists", 409));
     }
 
-    const token = jwt.sign({ email }, process.env.TOKEN_SIGN_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ email }, process.env.TOKEN_SIGN_SECRET, { expiresIn: "15m" });
     const link = `${req.protocol}://${req.headers.host}/users/verifyEmail/${token}`;
 
     const rfToken = jwt.sign({ email }, process.env.TOKEN_SIGN_SECRET);
@@ -39,8 +39,12 @@ export const signUp = async (req, res, next) => {
             city,
             state
         },
+        role
     });
-
+    req.data = {
+        model: userModel,
+        _id: user._id
+    }
     const newUser = await user.save();
 
     if (newUser) {
@@ -68,7 +72,10 @@ export const verifyEmail = async (req, res, next) => {
             { isEmailVerified: true },
             { new: true }
         );
-
+        req.data = {
+            model: userModel,
+            _id: user._id
+        }
         if (user) {
             return res.status(200).json({ message: "Email verification successful", user });
         }
@@ -187,10 +194,15 @@ export const logIn = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
-        const userExist = await userModel.findOne({ email, isEmailVerified: true }).select("+password")
+        const userExist = await userModel.findOne({ email }).select("+password")
+
         if (!userExist) {
             return res.status(400).json({ msg: "Invalid email or password" });
         }
+        if (!userExist.isEmailVerified) {
+            return res.status(400).json({ msg: "Verfing pending" });
+        }
+
         if (!bcrypt.compareSync(password, userExist.password)) {
             return res.status(400).json({ msg: "Invalid email or password" });
         }
@@ -274,7 +286,17 @@ export const updateProfile = async (req, res, next) => {
 
 export const myProfile = async (req, res, next) => {
     try {
-        const apiFeatures = new ApiFeatures(userModel.find(), req.qeury)
+        const user = await userModel.findById(req.user._id)
+        return res.status(200).json({ msg: "done", user })
+    }
+    catch (err) {
+        next(err);
+    }
+};
+export const allUsers = async (req, res, next) => {
+    try {
+
+        const apiFeatures = new ApiFeatures(userModel.find(), req.query)
             .filter()
             .pagination()
             .search()
@@ -282,17 +304,7 @@ export const myProfile = async (req, res, next) => {
             .select()
 
         const users = await apiFeatures.query
-        return res.status(200).json({ msg: "Done", users })
-    }
-    catch (err) {
-        next(err);
-
-    }
-};
-export const allUsers = async (req, res, next) => {
-    try {
-        const users = await userModel.find({ role: "user" })
-        return res.status(200).json({ msg: "Done", users })
+        return res.status(200).json({ msg: "Done", page: apiFeatures.page, users })
     }
     catch (err) {
         next(err);

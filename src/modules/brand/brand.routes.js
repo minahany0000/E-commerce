@@ -9,25 +9,39 @@ import { systemRoles } from "../../utils/systemRoles.js";
 
 const brandRouter = Router();
 
-// create brand
 brandRouter.post(
     "/createbrand",
     multerHost(validExtensions.image).single("image"),
     validate(BV.createBrandValidation),
-    auth([systemRoles.user]),
+    auth([systemRoles.admin]),
     asyncHandler(BC.createBrand)
 );
+brandRouter.get(
+    "/getAllBrands",
+    asyncHandler(BC.getAllBrands)
+);
 
-// update brand
-// brandRouter.put("/updatebrand/:id", ...);
+brandRouter.delete(
+    "/deleteBrand/:id",
+    auth([systemRoles.admin]),
+    validate(BV.deleteBrandValidation),
+    asyncHandler(BC.deleteBrand)
+);
 
-// delete brand
-// brandRouter.delete("/deletebrand/:id", ...);
+brandRouter.patch(
+    "/updateBrand/:id",
+    multerHost(validExtensions.image).single("image"),
+    auth([systemRoles.admin]),
+    validate(BV.updateBrandValidation),
+    asyncHandler(BC.updateBrand)
+);
 
-// get brand by id
-// brandRouter.get("/getbrand/:id", ...);
+//get brand products
 
-// get all subcategories
-// brandRouter.get("/getAllSubCategories", ...);
+
+// get prand categories
+
+
+// get brand subCategories
 
 export default brandRouter;

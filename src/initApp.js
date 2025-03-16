@@ -6,7 +6,7 @@ import { deleteFromDb } from "./utils/deleteFromDb.js";
 import cors from "cors"
 
 export const initApp = (app, express) => {
-    const port = 3000//process.env.PORT || 3001
+    const port = process.env.PORT || 3000
     app.use(cors())
     // json
     app.use((req, res, next) => {

@@ -38,3 +38,18 @@ export const createCartValidation = {
 
     headers: generalField.headers.required(),
 };
+
+export const removeFromCartValidation = {
+    params: Joi.object({
+        productId: Joi.string()
+            .pattern(/^[0-9a-fA-F]{24}$/) // Ensures productId is a valid MongoDB ObjectId
+            .required()
+            .messages({
+                "string.pattern.base": "Invalid product ID format",
+                "string.empty": "Product ID is required",
+                "any.required": "Product ID is required",
+            }),
+    }),
+
+    headers: generalField.headers.required(),
+};

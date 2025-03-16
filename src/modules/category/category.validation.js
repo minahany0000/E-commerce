@@ -25,3 +25,6 @@ export const updateCategoryValidation = {
     }).unknown(),
     headers: generalField.headers.required(),
 }
+export const deleteCategoryValidation = {
+    headers: generalField.headers.required(),
+}
