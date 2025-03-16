@@ -15,6 +15,7 @@ export function createInvoice(invoice, path) {
 
 function generateHeader(doc) {
     doc
+        .image("logo.png", 15, 15, { width: 150 })
         .fillColor("#444444")
         .fontSize(10)
         .text("Bulkify.", 200, 50, { align: "right" })
