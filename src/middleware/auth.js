@@ -16,9 +16,9 @@ const auth = (allowedRoles = []) => {
         if (!decoded?.email) {
             return next(new appError("No valid token found", 401))
         }
-        const user = await userModel.findOne({ email: decoded.email })
+        const user = await userModel.findOne({ email: decoded.email , loggedIn:true })
         if (!user) {
-            return next(new appError("User not exist", 404))
+            return next(new appError("User not exist or logged out", 404))
         }
         if (user.passwordChangedAt && parseInt(user.passwordChangedAt.getTime() / 1000) > decoded.iat) {
             return res.status(403).json({ msg: "Token expired, log in again" });
