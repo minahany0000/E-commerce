@@ -16,7 +16,7 @@ const auth = (allowedRoles = []) => {
         if (!decoded?.email) {
             return next(new appError("No valid token found", 401))
         }
-        const user = await userModel.findOne({ email: decoded.email , loggedIn:true })
+        const user = await userModel.findOne({ email: decoded.email })
         if (!user) {
             return next(new appError("User not exist or logged out", 404))
         }
