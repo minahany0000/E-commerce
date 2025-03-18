@@ -4,6 +4,8 @@
 
 This project is a **full-featured E-commerce platform** designed to provide users with a seamless online shopping experience. Key functionalities include:  
 
+###
+
 ✅ **User Authentication & Authorization** – Secure user login and registration.  
 ✅ **Product Management** – CRUD operations for products, categories, subcategories, and brands ,etc .  
 ✅ **Shopping Cart & Wishlist** – Users can add/remove products from their cart or wishlist.  
@@ -28,6 +30,9 @@ This project is a **full-featured E-commerce platform** designed to provide user
 ☁️ **MongoDB Atlas** – Cloud database service for MongoDB.  
 
 ---
+
+## 📌 Postman API Documentation  
+🔗 **Postman Collection:** [Click here to view](https://documenter.getpostman.com/view/42346862/2sAYkDP1kj#e0c9cbbf-187f-4b33-bcdf-1a74cf0d97ea)  
 
 ## 🎯 Features  
 
